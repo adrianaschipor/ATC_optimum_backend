@@ -1,0 +1,53 @@
+{
+  "name": "optimum_package",
+  "private": true,
+  "version": "1.0.0",
+  "description": "The package needed for Optimum project",
+  "main": "server.js",
+  "dependencies": {
+    "@types/sequelize": "^4.28.10",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "cookie": "^0.4.1",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.12.0",
+    "http": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
+    "jwt-redis": "^6.0.0",
+    "mocha": "^3.0.0",
+    "nodemailer": "^6.6.3",
+    "nodemon": "^2.0.12",
+    "pg": "^8.6.0",
+    "pg-hstore": "^2.3.4",
+    "redis": "^3.1.2",
+    "router": "^1.3.5",
+    "sequelize": "^6.6.5",
+    "socket.io": "^4.1.3",
+    "validator": "^13.6.0"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-mocha": "^2.2.0",
+    "mocha-junit-reporter": "^1.12.0",
+    "gulp-istanbul": "^1.1.3",
+    "nyc": "^12.0.2"
+  },
+  "scripts": {
+    "build": "nyc --reporter=cobertura --reporter=html ./node_modules/.bin/mocha tests/**/*.js --reporter mocha-junit-reporter --reporter-options mochaFile=./TEST-RESULTS.xml",
+    "develop": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adrianaschipor/ATC_optimum_backend.git"
+  },
+  "author": "Schipor Adriana",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adrianaschipor/ATC_optimum_backend/issues"
+  },
+  "homepage": "https://github.com/adrianaschipor/ATC_optimum_backend#readme"
+}
