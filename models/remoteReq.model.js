@@ -2,7 +2,7 @@ const Sequelize = require("sequelize");
 const db = require("../config/database.config");
 const user_model = require("./user.model");
 
-const remote = db.define("Remote", {
+const remoteReq = db.define("RemoteRequests", {
   percentage: {
     type: Sequelize.FLOAT,
     allowNull: false,
@@ -35,5 +35,5 @@ const remote = db.define("Remote", {
   },
 });
 
-remote.sync({ alter: true });
-module.exports = remote;
+remoteReq.sync({ alter: true });
+module.exports = remoteReq;
