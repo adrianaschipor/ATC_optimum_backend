@@ -43,7 +43,6 @@ const office = db.define("Office", {
       model: user_model,
       key: "id",
     },
-    onDelete: "cascade",
     allowNull: true,
   },
 });
