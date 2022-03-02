@@ -6,7 +6,7 @@ const building = db.define("Building", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  floors_count: {
+  floorsCount: {
     type: Sequelize.INTEGER,
     allowNull: false,
   },
