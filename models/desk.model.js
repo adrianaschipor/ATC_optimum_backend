@@ -1,4 +1,3 @@
-const { INTEGER } = require("sequelize");
 const Sequelize = require("sequelize");
 const db = require("../config/database.config");
 const office_model = require("./office.model");
