@@ -28,6 +28,15 @@ exports.create = async (req, res) => {
       return res
         .status(400)
         .send({ message: "Invalid Building: This building doesn't exist" });
+    //already existing
+    existingOffice = await Office.findOne({
+      where: { name: name, buildingId: buildingId },
+    });
+    if (existingOffice)
+      return res.status(400).send({
+        message:
+          "Invalid Name: There's already an office with this name in this building",
+      });
     //floorNo
     if (floorNo == null || floorNo > building.floorsCount || floorNo < 0)
       return res.status(400).send({ message: "Invalid Floor Number." });
