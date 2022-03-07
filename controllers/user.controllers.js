@@ -195,3 +195,23 @@ exports.update = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//find all users
+exports.findAll = async (req, res) => {
+  try {
+    let users = {};
+    users = await User.findAll();
+
+    for (const user of users) {
+      //set birthday to string
+      user.dataValues.birthday = new Date(
+        user.dataValues.birthday
+      ).toDateString();
+      //remove password
+      delete user.dataValues.password;
+    }
+    return res.status(200).send(users);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
