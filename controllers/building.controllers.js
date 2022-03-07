@@ -96,3 +96,14 @@ exports.delete = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Get all buildings
+exports.findAll = async (req, res) => {
+  try {
+    let buildings = {};
+    buildings = await Building.findAll();
+    return res.status(200).send(buildings);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
