@@ -3,31 +3,31 @@ const db = require("../config/database.config");
 
 const user = db.define("User", {
   firstname: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: false,
   },
   lastname: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: false,
   },
   email: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(50),
     allowNull: false,
     unique: true,
   },
   password: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: false,
   },
   role: {
     type: Sequelize.STRING,
-    isIn: [["admin"], ["ofiice_admin"], ["employee"]],
-    defaultValue: "employee",
+    isIn: [["Admin"], ["Office Admin"], ["Employee"]],
+    defaultValue: "Employee",
     allowNull: false,
   },
   gender: {
     type: Sequelize.STRING,
-    isIn: [["admin"], ["ofiice_admin"], ["employee"]],
+    isIn: [["Female"], ["Male"], ["Other"]],
     defaultValue: "employee",
     allowNull: false,
   },
@@ -36,7 +36,7 @@ const user = db.define("User", {
     allowNull: true,
   },
   nationality: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: true,
   },
   active: {
@@ -46,9 +46,6 @@ const user = db.define("User", {
   },
   token: {
     type: Sequelize.STRING(5000),
-  },
-  code: {
-    type: Sequelize.BIGINT,
   },
 });
 user.sync({ alter: true });
