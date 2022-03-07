@@ -175,3 +175,24 @@ exports.update = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Delete existing Office
+exports.delete = async (req, res) => {
+  try {
+    const currentOffice = await Office.findOne({
+      where: { id: req.params.officeId },
+    });
+    if (!currentOffice) return res.status(404).send("Office not found.");
+
+    if (currentOffice.totalDesksCount != currentOffice.usableDesksCount)
+      return res
+        .status(404)
+        .send({ message: "Couldn't remove office: not all desks ar free" });
+
+    if ((await Office.destroy({ where: { id: req.params.officeId } })) != 1)
+      return res.status(404).send({ message: "Couldn't remove office." });
+    return res.status(200).send({ message: "Office successfully removed !" });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
