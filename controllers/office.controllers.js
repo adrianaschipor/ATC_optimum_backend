@@ -207,3 +207,16 @@ exports.findAll = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Get all offices from a building
+exports.findAllFromBuilding = async (req, res) => {
+  try {
+    let offices = {};
+    offices = await Office.findAll({
+      where: { buildingId: req.params.buildingId },
+    });
+    return res.status(200).send(offices);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
