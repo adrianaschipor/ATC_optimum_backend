@@ -124,7 +124,7 @@ exports.update = async (req, res) => {
     const emailExists = await User.findOne({
       where: { email: email },
     });
-    if (emailExists && emailExists != currentUser.email)
+    if (emailExists && email != currentUser.email)
       return res.status(400).json({ msg: "This email is already used" });
     var regex = /^[^\s@]+@[^\s@]+.[^\s@]+$/;
     if (!regex.test(email) || email.length > 50) {
