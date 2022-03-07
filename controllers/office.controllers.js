@@ -220,3 +220,17 @@ exports.findAllFromBuilding = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Get Office Status
+exports.findOne = async (req, res) => {
+  try {
+    const office = await Office.findOne({
+      where: { id: req.params.officeId },
+    });
+    if (!office) return res.status(404).send("Office not found.");
+
+    return res.status(200).send(office);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
