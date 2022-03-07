@@ -5,7 +5,7 @@ const user_model = require("./user.model");
 
 const office = db.define("Office", {
   name: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: false,
   },
   floorNo: {
