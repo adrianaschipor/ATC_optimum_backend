@@ -80,3 +80,19 @@ exports.update = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Delete existing Building
+exports.delete = async (req, res) => {
+  try {
+    const currentBuilding = await Building.findOne({
+      where: { id: req.params.buildingId },
+    });
+    if (!currentBuilding) return res.status(404).send("Building not found.");
+
+    if ((await Building.destroy({ where: { id: req.params.buildingId } })) != 1)
+      return res.status(404).send({ message: "Couldn't remove building." });
+    return res.status(200).send({ message: "Building successfully removed !" });
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
