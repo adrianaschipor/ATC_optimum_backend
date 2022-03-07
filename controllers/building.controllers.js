@@ -12,6 +12,13 @@ exports.create = async (req, res) => {
     //address
     if (address == null || address.length > 50)
       return res.status(400).send({ message: "Invalid Address." });
+    const existingBuilding = await Building.findOne({
+      where: { address: address },
+    });
+    if (existingBuilding)
+      return res.status(400).send({
+        message: "Invalid Address. There's already a building at this address.",
+      });
     //floorsCount
     if (floorsCount == null || floorsCount < 1 || floorsCount > 150)
       return res.status(400).send({ message: "Invalid Floors Count." });
@@ -28,3 +35,5 @@ exports.create = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Update existing Building
