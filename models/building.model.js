@@ -3,7 +3,7 @@ const db = require("../config/database.config");
 
 const building = db.define("Building", {
   name: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(30),
     allowNull: false,
   },
   floorsCount: {
@@ -11,7 +11,7 @@ const building = db.define("Building", {
     allowNull: false,
   },
   address: {
-    type: Sequelize.STRING,
+    type: Sequelize.STRING(50),
     allowNull: false,
   },
 });
