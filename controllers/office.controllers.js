@@ -196,3 +196,14 @@ exports.delete = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Get all offices
+exports.findAll = async (req, res) => {
+  try {
+    let offices = {};
+    offices = await Office.findAll();
+    return res.status(200).send(offices);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
