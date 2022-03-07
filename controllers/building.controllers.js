@@ -107,3 +107,17 @@ exports.findAll = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//Get specific Building
+exports.findOne = async (req, res) => {
+  try {
+    const building = await Building.findOne({
+      where: { id: req.params.buildingId },
+    });
+    if (!building) return res.status(404).send("Building not found.");
+
+    return res.status(200).send(building);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
