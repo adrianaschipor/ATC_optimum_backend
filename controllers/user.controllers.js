@@ -215,3 +215,25 @@ exports.findAll = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//find all office admins
+exports.findAllOfficeAdmins = async (req, res) => {
+  try {
+    let officeAdmins = {};
+    officeAdmins = await User.findAll({
+      where: { role: "Office Admin" },
+    });
+
+    for (const user of officeAdmins) {
+      //set birthday to string
+      user.dataValues.birthday = new Date(
+        user.dataValues.birthday
+      ).toDateString();
+      //remove password
+      delete user.dataValues.password;
+    }
+    return res.status(200).send(officeAdmins);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
