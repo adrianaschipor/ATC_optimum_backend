@@ -75,11 +75,6 @@ exports.create = async (req, res) => {
     let prefRowsCount = Math.floor(width / neededWidthPerDesk);
     let prefColumnsCount = Math.floor(length / neededLengthPerDesk);
 
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n");
-    //console.log(Desk.neededLength + " " + Desk.neededWidth);
-    console.log(prefColumnsCount + " " + prefRowsCount);
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n");
-
     if (prefColumnsCount * prefRowsCount < totalDesksCount)
       return res.status(400).send({
         message: "Invalid Total Desks Count: The Office is not large enough.",
@@ -96,10 +91,38 @@ exports.create = async (req, res) => {
       officeAdminId,
     };
 
-    //create all usable desks
-    // for (let i = 0; i < usableDesksCount; i++) await Desk.create({});
-
     const office = await Office.create(newOffice);
+
+    //Add to database all desks from this new Office
+    let usableDesks = usableDesksCount;
+    let unusableDesks = totalDesksCount - usableDesksCount;
+    for (let i = 1; i <= prefRowsCount; i++)
+      for (let j = 1; j <= prefColumnsCount; j++) {
+        if (usableDesks == 0 && unusableDesks == 0) break;
+        //add to database usable Desks
+        if (usableDesks != 0) {
+          await Desk.create({
+            width: defaultDeskWidth,
+            length: defaultDeskLength,
+            position: [i, j],
+            usable: true,
+            officeId: office.id,
+            userId: null,
+          });
+          usableDesks--;
+        } else {
+          //add to database unusable Desks
+          await Desk.create({
+            width: defaultDeskWidth,
+            length: defaultDeskLength,
+            position: [i, j],
+            usable: false,
+            officeId: office.id,
+            userId: null,
+          });
+          unusableDesks--;
+        }
+      }
     return res.status(201).send(office.id.toString());
   } catch (err) {
     return res.status(500).send({ message: err.message });
