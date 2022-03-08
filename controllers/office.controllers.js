@@ -1,6 +1,7 @@
 const Office = require("../models/office.model");
 const Building = require("../models/building.model");
 const User = require("../models/user.model");
+const Desk = require("../models/desk.model");
 
 //Create new Office
 exports.create = async (req, res) => {
@@ -47,10 +48,10 @@ exports.create = async (req, res) => {
     if (usableDesksCount < 0 || usableDesksCount > totalDesksCount)
       return res.status(400).send({ message: "Invalid Usable Desks Count." });
     //width
-    if (width < 1 || width > 500)
+    if (width < 5 || width > 500)
       return res.status(400).send({ message: "Invalid Width." });
     //length
-    if (length < 1 || length > 500)
+    if (length < 5 || length > 500)
       return res.status(400).send({ message: "Invalid Length." });
     //officeAdminId - optional
     if (officeAdminId != null) {
@@ -65,6 +66,25 @@ exports.create = async (req, res) => {
         });
     }
 
+    // check if totalDesksCount fit inside office
+    const defaultDeskWidth = 0.5;
+    const defaultDeskLength = 1;
+    //We take in consideration that a desk placed inside an office needs more space than its size
+    const neededWidthPerDesk = defaultDeskWidth + 1.5;
+    const neededLengthPerDesk = defaultDeskLength + 1;
+    let prefRowsCount = Math.floor(width / neededWidthPerDesk);
+    let prefColumnsCount = Math.floor(length / neededLengthPerDesk);
+
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n");
+    //console.log(Desk.neededLength + " " + Desk.neededWidth);
+    console.log(prefColumnsCount + " " + prefRowsCount);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n\n\n");
+
+    if (prefColumnsCount * prefRowsCount < totalDesksCount)
+      return res.status(400).send({
+        message: "Invalid Total Desks Count: The Office is not large enough.",
+      });
+
     const newOffice = {
       name,
       floorNo,
@@ -75,6 +95,9 @@ exports.create = async (req, res) => {
       buildingId,
       officeAdminId,
     };
+
+    //create all usable desks
+    // for (let i = 0; i < usableDesksCount; i++) await Desk.create({});
 
     const office = await Office.create(newOffice);
     return res.status(201).send(office.id.toString());
@@ -136,10 +159,10 @@ exports.update = async (req, res) => {
     if (usableDesksCount < 0 || usableDesksCount > totalDesksCount)
       return res.status(400).send({ message: "Invalid Usable Desks Count." });
     //width
-    if (width < 1 || width > 500)
+    if (width < 5 || width > 500)
       return res.status(400).send({ message: "Invalid Width." });
     //length
-    if (length < 1 || length > 500)
+    if (length < 5 || length > 500)
       return res.status(400).send({ message: "Invalid Length." });
     //officeAdminId - optional
     if (officeAdminId != null) {
