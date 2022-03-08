@@ -17,6 +17,11 @@ const desk = db.define("Desk", {
     type: Sequelize.ARRAY(Sequelize.INTEGER),
     allowNull: false,
   },
+  usable: {
+    type: Sequelize.BOOLEAN,
+    allowNull: false,
+    default: true,
+  },
   officeId: {
     type: Sequelize.INTEGER,
     references: {
