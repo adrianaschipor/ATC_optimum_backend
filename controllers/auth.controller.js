@@ -22,14 +22,35 @@ exports.login = async (req, res) => {
   }
 
   let body = { id: user.id, email: user.email, role: user.role };
-  //  const refreshtoken = createRefreshToken({ id: user._id });
   let accessToken = jwt.sign({ user: body }, "access", {
     expiresIn: "1d",
-  }); //expires in 10m
+  });
   let refreshToken = jwt.sign({ user: body }, "refresh", {
     expiresIn: "7d",
-  }); //expires in 7 days
+  });
   return res
     .status(201)
     .json({ accessToken: accessToken, refreshToken: refreshToken });
+};
+
+exports.refreshToken = (req, res) => {
+  try {
+    const refreshToken = req.cookies.refresh;
+    if (!refreshToken)
+      return res.status(403).json({ msg: "You must log in or register" });
+
+    jwt.verify(refreshToken, "refresh", (err, user) => {
+      if (err)
+        return res.status(403).json({ msg: "You must log in or register" });
+
+      console.log("\n\n\n\n" + user);
+      const accessToken = jwt.sign({ user }, "access", {
+        expiresIn: "1d",
+      });
+
+      return res.status(201).json({ accessToken: accessToken });
+    });
+  } catch (err) {
+    return res.status(500).json({ msg: err.message });
+  }
 };
