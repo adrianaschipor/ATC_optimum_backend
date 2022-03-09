@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 const User = require("../models/user.model");
 
 exports.login = async (req, res) => {
@@ -21,11 +22,11 @@ exports.login = async (req, res) => {
     });
   }
 
-  let body = { id: user.id, email: user.email, role: user.role };
-  let accessToken = jwt.sign({ user: body }, "access", {
+  const tokenUser = { id: user.id, email: user.email, role: user.role };
+  let accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d",
   });
-  let refreshToken = jwt.sign({ user: body }, "refresh", {
+  let refreshToken = jwt.sign(tokenUser, process.env.REFRESH_TOKEN_SECRET, {
     expiresIn: "7d",
   });
   return res
@@ -39,11 +40,12 @@ exports.refreshToken = (req, res) => {
     if (!refreshToken)
       return res.status(403).json({ msg: "You must log in or register" });
 
-    jwt.verify(refreshToken, "refresh", (err, user) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, user) => {
       if (err)
         return res.status(403).json({ msg: "You must log in or register" });
 
-      const accessToken = jwt.sign({ user }, "access", {
+      const tokenUser = { id: user.id, email: user.email, role: user.role };
+      const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1d",
       });
 
