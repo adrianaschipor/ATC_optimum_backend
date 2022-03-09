@@ -69,9 +69,6 @@ exports.create = async (req, res) => {
     let prefRowsCount = Math.floor(width / neededWidthPerDesk);
     let prefColumnsCount = Math.floor(length / neededLengthPerDesk);
     let maxDesksCount = prefRowsCount * prefColumnsCount;
-    //we make copies because  totalDesksCount and usableDesksCount are constants and we won't be allowed to modify them if needed
-    // let totalDesksCount_final = totalDesksCount;
-    // let usableDesksCount_final = usableDesksCount;
     // we place only as many officess as they can fit inside office
     if (totalDesksCount > maxDesksCount) totalDesksCount = maxDesksCount;
     if (usableDesksCount > maxDesksCount) usableDesksCount = maxDesksCount;
@@ -79,8 +76,8 @@ exports.create = async (req, res) => {
     const newOffice = {
       name,
       floorNo,
-      totalDesksCount, //: totalDesksCount_final,
-      usableDesksCount, //: usableDesksCount_final,
+      totalDesksCount,
+      usableDesksCount,
       width,
       length,
       buildingId,
@@ -195,6 +192,22 @@ exports.update = async (req, res) => {
           message: "Invalid Office Admin: This user isn't an Office Admin",
         });
     }
+
+    // !!!TO ADD:
+    // 1. Accept only the increasing of office size for now
+    // 2. Handle Desks if totalDesksCount and usableDesksCount are modified (should calculate rows, columns, maxDesks, free positions
+    // T = totalDesksCount, U= usableDesksCount
+    // all 9 situations:
+    // T=, U= -> no changes
+    // T=, U> -> make some existing unusable desks to be usable
+    // T=, U< -> make some existing usable (+free) desks to be unusable
+    // T>, U= -> add some new unsusable desks
+    // T>, U> -> add some new usable desks
+    // T>, U< -> add some new unsusable desks + make some existing usable(+free) desks to be unusable
+    // T<, U= -> remove some unusable desks
+    // T<, U> -> remove some unusable desks + make some unusable desks to be usable
+    // T<, U< -> remove some usable (+ free) desks
+    //OBS: When adding, pay attention to place them into free positions
 
     const updatedOffice = {
       name,
