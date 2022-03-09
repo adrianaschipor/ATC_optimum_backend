@@ -43,7 +43,6 @@ exports.refreshToken = (req, res) => {
       if (err)
         return res.status(403).json({ msg: "You must log in or register" });
 
-      console.log("\n\n\n\n" + user);
       const accessToken = jwt.sign({ user }, "access", {
         expiresIn: "1d",
       });
