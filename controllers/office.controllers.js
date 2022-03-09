@@ -2,20 +2,19 @@ const Office = require("../models/office.model");
 const Building = require("../models/building.model");
 const User = require("../models/user.model");
 const Desk = require("../models/desk.model");
+// calculate how many desks fit inside office
+const DEFAULT_DESK_WIDTH = 0.5;
+const DEFAULT_DESK_LENGTH = 1;
+//We take in consideration that a desk placed inside an office needs more space than its size
+const neededWidthPerDesk = DEFAULT_DESK_WIDTH + 1.5;
+const neededLengthPerDesk = DEFAULT_DESK_LENGTH + 1;
 
 //Create new Office
 exports.create = async (req, res) => {
   try {
-    const {
-      name,
-      buildingId,
-      floorNo,
-      totalDesksCount,
-      usableDesksCount,
-      width,
-      length,
-      officeAdminId,
-    } = req.body;
+    const { name, buildingId, floorNo, width, length, officeAdminId } =
+      req.body;
+    let { totalDesksCount, usableDesksCount } = req.body;
 
     //VALIDATIONS
     //name
@@ -24,7 +23,7 @@ exports.create = async (req, res) => {
     //buildingId
     if (buildingId == null)
       return res.status(400).send({ message: "Invalid Building." });
-    building = await Building.findOne({ where: { id: buildingId } });
+    const building = await Building.findOne({ where: { id: buildingId } });
     if (!building)
       return res
         .status(400)
@@ -66,25 +65,22 @@ exports.create = async (req, res) => {
         });
     }
 
-    // check if totalDesksCount fit inside office
-    const defaultDeskWidth = 0.5;
-    const defaultDeskLength = 1;
-    //We take in consideration that a desk placed inside an office needs more space than its size
-    const neededWidthPerDesk = defaultDeskWidth + 1.5;
-    const neededLengthPerDesk = defaultDeskLength + 1;
+    // calculate how many desks fit inside office
     let prefRowsCount = Math.floor(width / neededWidthPerDesk);
     let prefColumnsCount = Math.floor(length / neededLengthPerDesk);
-
-    if (prefColumnsCount * prefRowsCount < totalDesksCount)
-      return res.status(400).send({
-        message: "Invalid Total Desks Count: The Office is not large enough.",
-      });
+    let maxDesksCount = prefRowsCount * prefColumnsCount;
+    //we make copies because  totalDesksCount and usableDesksCount are constants and we won't be allowed to modify them if needed
+    // let totalDesksCount_final = totalDesksCount;
+    // let usableDesksCount_final = usableDesksCount;
+    // we place only as many officess as they can fit inside office
+    if (totalDesksCount > maxDesksCount) totalDesksCount = maxDesksCount;
+    if (usableDesksCount > maxDesksCount) usableDesksCount = maxDesksCount;
 
     const newOffice = {
       name,
       floorNo,
-      totalDesksCount,
-      usableDesksCount,
+      totalDesksCount, //: totalDesksCount_final,
+      usableDesksCount, //: usableDesksCount_final,
       width,
       length,
       buildingId,
@@ -102,8 +98,8 @@ exports.create = async (req, res) => {
         //add to database usable Desks
         if (usableDesks != 0) {
           await Desk.create({
-            width: defaultDeskWidth,
-            length: defaultDeskLength,
+            width: DEFAULT_DESK_WIDTH,
+            length: DEFAULT_DESK_LENGTH,
             position: [i, j],
             usable: true,
             officeId: office.id,
@@ -113,8 +109,8 @@ exports.create = async (req, res) => {
         } else {
           //add to database unusable Desks
           await Desk.create({
-            width: defaultDeskWidth,
-            length: defaultDeskLength,
+            width: DEFAULT_DESK_WIDTH,
+            length: DEFAULT_DESK_LENGTH,
             position: [i, j],
             usable: false,
             officeId: office.id,
@@ -230,10 +226,10 @@ exports.delete = async (req, res) => {
     });
     if (!currentOffice) return res.status(404).send("Office not found.");
 
-    if (currentOffice.totalDesksCount != currentOffice.usableDesksCount)
+    /*    if (currentOffice.totalDesksCount != currentOffice.usableDesksCount)
       return res
         .status(404)
-        .send({ message: "Couldn't remove office: not all desks ar free" });
+        .send({ message: "Couldn't remove office: not all desks ar free" });*/
 
     if ((await Office.destroy({ where: { id: req.params.officeId } })) != 1)
       return res.status(404).send({ message: "Couldn't remove office." });
