@@ -127,3 +127,21 @@ exports.approval = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+// get all remote requests
+exports.findAll = async (req, res) => {
+  try {
+    let requests = {};
+    requests = await RemoteReq.findAll();
+
+    // the Admin gets to see all the requests, while the other users can see only their own requests
+    if (req.user.role === "Admin") {
+      requests = await RemoteReq.findAll();
+    } else {
+      requests = await RemoteReq.findAll({ where: { userId: req.user.id } });
+    }
+    return res.status(200).send(requests);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
