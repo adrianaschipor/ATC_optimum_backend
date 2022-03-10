@@ -7,12 +7,20 @@ const remoteReq = db.define("RemoteRequests", {
     type: Sequelize.FLOAT,
     allowNull: false,
   },
-  startDated: {
+  /*startDate: {
     type: Sequelize.DATEONLY,
+    allowNull: false,
+  },*/
+  year: {
+    type: Sequelize.INTEGER,
+    allowNull: false,
+  },
+  month: {
+    type: Sequelize.INTEGER,
     allowNull: false,
   },
   requestReason: {
-    type: Sequelize.TEXT,
+    type: Sequelize.TEXT(2000),
     allowNull: false,
   },
   status: {
@@ -22,7 +30,7 @@ const remoteReq = db.define("RemoteRequests", {
     allowNull: false,
   },
   rejectReason: {
-    type: Sequelize.TEXT,
+    type: Sequelize.TEXT(2000),
     allowNull: true,
   },
   userId: {
