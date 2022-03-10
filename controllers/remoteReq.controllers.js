@@ -1,4 +1,5 @@
 const RemoteReq = require("../models/remoteReq.model");
+const Desk = require("../models/desk.model");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
@@ -45,7 +46,7 @@ exports.create = async (req, res) => {
     });
     if (alreadyRemote)
       return res.status(400).send({
-        message: "Cannot send request: Already working remote",
+        message: "Rejected: Already working remote",
       });
 
     //check if requesting user has a pending request for this month
@@ -61,8 +62,7 @@ exports.create = async (req, res) => {
     });
     if (pendingReq)
       return res.status(400).send({
-        message:
-          "Cannot send request: You have a pending request for this month",
+        message: "Rejected: You have a pending request for this month",
       });
 
     // create the new request
@@ -77,6 +77,52 @@ exports.create = async (req, res) => {
 
     const remoteReq = await RemoteReq.create(newRemoteReq);
     return res.status(201).send(remoteReq.id.toString());
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+// Approve / Reject a request
+exports.approval = async (req, res) => {
+  try {
+    const { status, rejectReason } = req.body;
+
+    const theReq = await RemoteReq.findOne({
+      where: { id: req.params.remoteReqId },
+    });
+    if (!theReq) return res.status(404).send("Remote Request not found.");
+
+    //VALIDATIONS
+    //status
+    if (status != "Approved" && status != "Rejected")
+      return res.status(404).send("Invalid Status");
+    //rejectReason
+    if (status === "Rejected") {
+      if (!rejectReason || rejectReason === "")
+        return res.status(400).send({
+          message:
+            "Invalid Rejection Reason: You should provide a reason for your rejection",
+        });
+      if (rejectReason.length > 2000)
+        return res.status(400).send({
+          message: "Invalid Rejection Reason: Your reason is too long",
+        });
+    }
+    // If a request to work 100% remote is approved, the occupied desk by user becomes free
+    if (status === "Approved" && theReq.percentage === 100) {
+      let desk = await Desk.findOne({ where: { userId: theReq.userId } });
+      if (desk) {
+        desk.userId = null;
+        await desk.save();
+      }
+    }
+
+    theReq.status = status;
+    theReq.rejectReason = rejectReason;
+    await theReq.save();
+    return res
+      .status(200)
+      .send("Remote Request successfully approved/rejected");
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
