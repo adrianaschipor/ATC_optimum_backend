@@ -5,22 +5,41 @@ module.exports = (app) => {
   const authOfficeAdmin = require("../middlewares/authOfficeAdmin");
   const authAllAdminTypes = require("../middlewares/authAllAdminTypes");
   const authAllUsers = require("../middlewares/authAllUsers");
+  const activeAccount = require("../middlewares/activeAccount");
 
-  //Create new User
-  app.post("/user", auth, authAdmin, User.create);
+  // Endpoint for creating a new user
+  // Only an authenticated Admin with an active account can perform this
+  app.post("/user", auth, authAdmin, activeAccount, User.create);
 
-  //Update existing User
-  app.put("/user/:userId", auth, authAdmin, User.update);
+  // Endpoint for updating an existing user, change of "active" (activate/deactivate) is also treated here
+  // Only an authenticated Admin with an active account can perform this
+  app.put("/user/:userId", auth, authAdmin, activeAccount, User.update);
 
-  //Get all users
-  app.get("/allUsers", auth, authAllAdminTypes, User.findAll);
+  // Endpoint used for getting all office admins when adding/updating an office
+  // Only an authenticated Admin with an active account can perform this
+  app.get(
+    "/allOfficeAdmins",
+    auth,
+    authAdmin,
+    activeAccount,
+    User.findAllOfficeAdmins
+  );
 
-  //Get all office admins
-  app.get("/allOfficeAdmins", auth, authAdmin, User.findAllOfficeAdmins);
+  // Endpoint for getting all users based on name search
+  // This is available for all authenticated users with an active account
+  // Admins get more details than other type of user
+  app.get(
+    "/allUsers/:name",
+    auth,
+    authAllUsers,
+    activeAccount,
+    User.findAllByName
+  );
 
-  //Get all users from an Office Admin offices
+  // Get all users from an Office Admin offices -> May or may not be needed
   //   app.get("/allUsersOfOfficeAdmin", auth, authOfficeAdmin,User.findAllUsersOfOfficeAdmin);
 
-  //Get user status
-  //app.get("/user/:name", auth, authAllUsers,User.findAllByName);
+  // Endpoint for geting all users - !! NOT needed -> included in findAllByName, no substring introduced situation -> Don't know for sure yet, also not required
+  // This is used for visualising users when selecting one
+  //app.get("/allUsers", auth, authAllAdminTypes, User.findAll);
 };
