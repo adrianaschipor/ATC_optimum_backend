@@ -5,5 +5,5 @@ module.exports = (app) => {
   app.post("/login", Auth.login);
 
   // Refresh token endpoint
-  app.post("/refresh-token", Auth.refreshToken);
+  app.get("/refresh-token", Auth.refreshToken);
 };
