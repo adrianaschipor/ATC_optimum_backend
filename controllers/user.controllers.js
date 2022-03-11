@@ -1,5 +1,6 @@
 const Sequelize = require("sequelize");
 const User = require("../models/user.model");
+const Desk = require("../models/desk.model");
 
 // Controller used when adding a new user
 exports.create = async (req, res) => {
@@ -56,11 +57,7 @@ exports.create = async (req, res) => {
     if (birthday != null) {
       let birthdayAsDate = new Date(birthday);
       let year = birthdayAsDate.getFullYear;
-      if (
-        birthdayAsDate == NaN ||
-        year < 1900 ||
-        year > new Date().getFullYear() + 1
-      )
+      if (birthdayAsDate == NaN || year < 1900 || birthdayAsDate > new Date())
         return res.status(400).send({
           message: "Invalid birthday",
         });
@@ -152,20 +149,16 @@ exports.update = async (req, res) => {
       return res.status(400).send({
         message: "Invalid gender.",
       });
-    //birthday
+    //birthday - not mandatory
     if (birthday != null) {
       let birthdayAsDate = new Date(birthday);
       let year = birthdayAsDate.getFullYear;
-      if (
-        birthdayAsDate == NaN ||
-        year < 1900 ||
-        year > new Date().getFullYear() + 1
-      )
+      if (birthdayAsDate == NaN || year < 1900 || birthdayAsDate > new Date())
         return res.status(400).send({
           message: "Invalid birthday",
         });
     }
-    //nationality
+    //nationality - not mandatory
     if (nationality != null) {
       if (nationality.length > 30)
         return res.status(400).send({
@@ -173,7 +166,20 @@ exports.update = async (req, res) => {
         });
     }
 
-    //treat activating/deactivating situation
+    //treat deactivating account situation
+    if (!active) {
+      // prevent admin from deactivating his own account
+      if (currentUser.id === req.user.id)
+        return res.status(400).send({
+          message: "You're not allowed to deactivate your own account",
+        });
+      // remove the assigned desk of deactivated user
+      let desk = await Desk.findOne({ where: { userId: req.params.userId } });
+      if (desk) {
+        desk.userId = null;
+        await desk.save();
+      }
+    }
 
     const updatedUser = {
       firstname,
