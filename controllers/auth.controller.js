@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
     });
   }
 
-  const tokenUser = { id: user.id, email: user.email, role: user.role };
+  const tokenUser = { id: user.id, role: user.role, active: user.active };
   let accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d",
   });
@@ -44,7 +44,7 @@ exports.refreshToken = (req, res) => {
       if (err)
         return res.status(403).json({ msg: "You must log in or register" });
 
-      const tokenUser = { id: user.id, email: user.email, role: user.role };
+      const tokenUser = { id: user.id, role: user.role, active: user.active };
       const accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
         expiresIn: "1d",
       });
