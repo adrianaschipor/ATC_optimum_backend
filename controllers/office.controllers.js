@@ -194,7 +194,7 @@ exports.update = async (req, res) => {
     }
 
     // !!!TO ADD:
-    // 1. Accept only the increasing of office size for now
+    // 1. Accept only the increasing of office size for now, no time for treating all the decreasing consequences
     // 2. Handle Desks if totalDesksCount and usableDesksCount are modified (should calculate rows, columns, maxDesks, free positions
     // T = totalDesksCount, U= usableDesksCount
     // all 9 situations:
@@ -239,10 +239,14 @@ exports.delete = async (req, res) => {
     });
     if (!currentOffice) return res.status(404).send("Office not found.");
 
-    /*    if (currentOffice.totalDesksCount != currentOffice.usableDesksCount)
-      return res
-        .status(404)
-        .send({ message: "Couldn't remove office: not all desks ar free" });*/
+    // check if all usable desks are free
+    const freeDesks = await Desk.findAll({
+      where: { officeId: currentOffice.id, usable: true, userId: null },
+    });
+    if (freeDesks.length != currentOffice.usableDesksCount)
+      return res.status(400).send({
+        message: "Cannot remove office: Not all usable desks are free",
+      });
 
     if ((await Office.destroy({ where: { id: req.params.officeId } })) != 1)
       return res.status(404).send({ message: "Couldn't remove office." });
