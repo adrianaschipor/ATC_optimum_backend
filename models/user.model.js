@@ -44,9 +44,6 @@ const user = db.define("User", {
     defaultValue: true,
     allowNull: false,
   },
-  token: {
-    type: Sequelize.STRING(5000),
-  },
 });
 user.sync({ alter: true });
 
