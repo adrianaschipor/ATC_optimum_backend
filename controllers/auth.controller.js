@@ -24,6 +24,13 @@ exports.login = async (req, res) => {
     });
   }
 
+  // Check if user acount is deactivated
+  if (!user.active)
+    return res.status(403).send({
+      accessToken: null,
+      message: "Your account is deactivated.",
+    });
+
   // user data that will be sent to frontend
   const tokenUser = { id: user.id, role: user.role, active: user.active };
   let accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
