@@ -267,6 +267,8 @@ exports.findAll = async (req, res) => {
   }
 };
 
+// TO ADD: role constraint for these 2 and the rest off the requested info for status
+
 //Get all offices from a building
 exports.findAllFromBuilding = async (req, res) => {
   try {
