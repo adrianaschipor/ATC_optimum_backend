@@ -12,6 +12,7 @@ exports.create = async (req, res) => {
     //address
     if (address == null || address.length > 50)
       return res.status(400).send({ message: "Invalid Address." });
+    // check if there is already a building at that address
     const existingBuilding = await Building.findOne({
       where: { address: address },
     });
