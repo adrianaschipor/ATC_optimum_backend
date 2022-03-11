@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const User = require("../models/user.model");
 
-//Create new User
+// Controller used when adding a new user
 exports.create = async (req, res) => {
   try {
     const {
@@ -52,7 +52,7 @@ exports.create = async (req, res) => {
       return res.status(400).send({
         message: "Invalid gender.",
       });
-    //birthday
+    //birthday - not mandatory
     if (birthday != null) {
       let birthdayAsDate = new Date(birthday);
       let year = birthdayAsDate.getFullYear;
@@ -65,13 +65,15 @@ exports.create = async (req, res) => {
           message: "Invalid birthday",
         });
     }
-    //nationality
+    //nationality - not mandatory
     if (nationality != null) {
       if (nationality.length > 30)
         return res.status(400).send({
           message: "Invalid nationality.",
         });
     }
+
+    // !! To add: bcrypt for password
 
     const newUser = {
       firstname,
@@ -82,6 +84,7 @@ exports.create = async (req, res) => {
       gender,
       birthday,
       nationality,
+      // when created, the user is active by default
       active: true,
     };
 
@@ -92,7 +95,7 @@ exports.create = async (req, res) => {
   }
 };
 
-//Update existing user
+// Controller used when an user is updated, activate/deactivate is also treated here
 exports.update = async (req, res) => {
   try {
     const currentUser = await User.findOne({
