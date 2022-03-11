@@ -318,39 +318,11 @@ exports.findAllOfficeAdmins = async (req, res) => {
   try {
     let officeAdmins = {};
     officeAdmins = await User.findAll({
+      attributes: ["id", "firstname", "lastname"],
       where: { role: "Office Admin" },
     });
-
-    for (const user of officeAdmins) {
-      //set birthday to string
-      user.dataValues.birthday = new Date(
-        user.dataValues.birthday
-      ).toDateString();
-      //remove password
-      delete user.dataValues.password;
-    }
     return res.status(200).send(officeAdmins);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
-
-//find all users !! NOT needed -> included in findAllByName, no substring introduced situation
-/*exports.findAll = async (req, res) => {
-  try {
-    let users = {};
-    users = await User.findAll();
-
-    for (const user of users) {
-      //set birthday to string
-      user.dataValues.birthday = new Date(
-        user.dataValues.birthday
-      ).toDateString();
-      //remove password
-      delete user.dataValues.password;
-    }
-    return res.status(200).send(users);
-  } catch (err) {
-    return res.status(500).send({ message: err.message });
-  }
-};*/
