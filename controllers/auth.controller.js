@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const User = require("../models/user.model");
 
+// Login controller
 exports.login = async (req, res) => {
   const user = await User.findOne({
     where: {
@@ -15,6 +16,7 @@ exports.login = async (req, res) => {
       .send({ accessToken: null, message: "Email not found " });
   }
 
+  // ! be careful to change this when adding bcrypt for password
   if (user.password != req.body.password) {
     return res.status(401).send({
       accessToken: null,
@@ -22,6 +24,7 @@ exports.login = async (req, res) => {
     });
   }
 
+  // user data that will be sent to frontend
   const tokenUser = { id: user.id, role: user.role, active: user.active };
   let accessToken = jwt.sign(tokenUser, process.env.ACCESS_TOKEN_SECRET, {
     expiresIn: "1d",
@@ -34,6 +37,7 @@ exports.login = async (req, res) => {
     .json({ accessToken: accessToken, refreshToken: refreshToken });
 };
 
+// Refresh token controller - used when access token expires
 exports.refreshToken = (req, res) => {
   try {
     const refreshToken = req.cookies.refresh;
