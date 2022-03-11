@@ -1,6 +1,10 @@
 const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 const User = require("../models/user.model");
 const Desk = require("../models/desk.model");
+const Office = require("../models/office.model");
+const Building = require("../models/building.model");
+const RemoteReq = require("../models/remoteReq.model");
 
 // Controller used when adding a new user
 exports.create = async (req, res) => {
@@ -205,27 +209,111 @@ exports.update = async (req, res) => {
   }
 };
 
-//find all users
-exports.findAll = async (req, res) => {
+// controller that returns all users based on name search
+exports.findAllByName = async (req, res) => {
   try {
     let users = {};
-    users = await User.findAll();
-
-    for (const user of users) {
-      //set birthday to string
-      user.dataValues.birthday = new Date(
-        user.dataValues.birthday
-      ).toDateString();
-      //remove password
-      delete user.dataValues.password;
+    const substr = "%" + req.params.name + "%";
+    if (req.user.role === "Admin") {
+      // Admins have access to more information than other users
+      users = await User.findAll({
+        attributes: [
+          "id",
+          "firstname",
+          "lastname",
+          "email",
+          "role",
+          "gender",
+          "birthday",
+          "nationality",
+          "active",
+        ],
+        where: {
+          [Op.or]: [
+            { firstname: { [Op.like]: substr } },
+            { lastname: { [Op.like]: substr } },
+          ],
+        },
+      });
+    } else {
+      users = await User.findAll({
+        attributes: ["id", "firstname", "lastname"],
+        where: {
+          [Op.and]: [
+            {
+              [Op.or]: [
+                { firstname: { [Op.like]: substr } },
+                { lastname: { [Op.like]: substr } },
+              ],
+            },
+            // usual user shouldn't be able to see deactivated accounts
+            { active: true },
+          ],
+        },
+      });
     }
+
+    // Add info about building, office and remote working for every user
+    for (let user of users) {
+      // search for office and building info
+      const desk = await Desk.findOne({
+        attributes: ["id", "officeId"],
+        where: { userId: user.id },
+      });
+      if (desk) {
+        const office = await Office.findOne({
+          attributes: ["id", "name", "buildingId"],
+          where: { id: desk.officeId },
+        });
+        if (office) {
+          // add info about office
+          user.dataValues.officeId = office.id;
+          user.dataValues.officeName = office.name;
+          const building = await Building.findOne({
+            attributes: ["id", "name"],
+          });
+          if (building) {
+            //add info about building
+            user.dataValues.buildingId = building.id;
+            user.dataValues.buildingName = building.name;
+          }
+        }
+      }
+      // search for remote info
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth() + 1; //the +1 converts the month from digital (0-11) to normal.
+      const workingRemote = await RemoteReq.findOne({
+        attributes: ["percentage"],
+        where: {
+          [Op.and]: [
+            { userId: user.id },
+            { status: "Approved" },
+            { year: currentYear },
+            { month: currentMonth },
+          ],
+        },
+      });
+      // add remote info
+      if (workingRemote) {
+        if (workingRemote.percentage === 100)
+          user.dataValues.remoteStatus = "fully remote";
+        else {
+          user.dataValues.remoteStatus = "partially remote";
+          user.dataValues.remotePercentage = workingRemote.percentage;
+        }
+      } else {
+        user.dataValues.remoteStatus = "NO";
+      }
+    }
+
     return res.status(200).send(users);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
 };
 
-//find all office admins
+// Controller that returns all office admins
 exports.findAllOfficeAdmins = async (req, res) => {
   try {
     let officeAdmins = {};
@@ -246,3 +334,23 @@ exports.findAllOfficeAdmins = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+//find all users !! NOT needed -> included in findAllByName, no substring introduced situation
+/*exports.findAll = async (req, res) => {
+  try {
+    let users = {};
+    users = await User.findAll();
+
+    for (const user of users) {
+      //set birthday to string
+      user.dataValues.birthday = new Date(
+        user.dataValues.birthday
+      ).toDateString();
+      //remove password
+      delete user.dataValues.password;
+    }
+    return res.status(200).send(users);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};*/
