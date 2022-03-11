@@ -1,12 +1,12 @@
-module.exports = (app) => {
-  const User = require("../controllers/user.controllers");
-  const auth = require("../middlewares/authJwt");
-  const authAdmin = require("../middlewares/authAdmin");
-  const authOfficeAdmin = require("../middlewares/authOfficeAdmin");
-  const authAllAdminTypes = require("../middlewares/authAllAdminTypes");
-  const authAllUsers = require("../middlewares/authAllUsers");
-  const activeAccount = require("../middlewares/activeAccount");
+const User = require("../controllers/user.controllers");
+const auth = require("../middlewares/authJwt");
+const authAdmin = require("../middlewares/authAdmin");
+const authOfficeAdmin = require("../middlewares/authOfficeAdmin");
+const authAllAdminTypes = require("../middlewares/authAllAdminTypes");
+const authAllUsers = require("../middlewares/authAllUsers");
+const activeAccount = require("../middlewares/activeAccount");
 
+module.exports = (app) => {
   // Endpoint for creating a new user
   // Only an authenticated Admin with an active account can perform this
   app.post("/user", auth, authAdmin, activeAccount, User.create);
