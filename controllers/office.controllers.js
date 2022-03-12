@@ -381,13 +381,70 @@ exports.findAllFromBuilding = async (req, res) => {
   }
 };
 
-//Get Office Status
+//Get Office Status - any user can see his office status
 exports.findOne = async (req, res) => {
   try {
-    const office = await Office.findOne({
-      where: { id: req.params.officeId },
+    // find user's office based on assigned desk
+    const desk = await Desk.findOne({
+      attributes: ["officeId"],
+      where: { userId: req.user.id },
     });
-    if (!office) return res.status(404).send("Office not found.");
+    if (!desk) return res.status(200).send("You're not assigned to any desk");
+    // find exact office
+    const office = await Office.findOne({
+      where: { id: desk.officeId },
+    });
+    if (!office)
+      return res
+        .status(200)
+        .send("The desk you're assigned to doesn't belong to any office");
+
+    // Add Status details
+    // Add building details
+    const building = await Building.findOne({
+      where: { id: office.buildingId },
+    });
+    if (building) office.dataValues.buildingName = building.name;
+    // Add Office Administrator details
+    const officeAdmin = await User.findOne({
+      attributes: ["firstname", "lastname"],
+      where: { id: office.officeAdminId },
+    });
+    if (officeAdmin)
+      office.dataValues.officeAdminName =
+        officeAdmin.firstname + " " + officeAdmin.lastname;
+    // Add list of names of all users from office
+    const desks = await Desk.findAll({
+      attributes: ["userId"],
+      where: { officeId: office.id },
+    });
+    if (desks) {
+      let officeUsers = [];
+      for (const desk of desks) {
+        const user = await User.findOne({
+          attributes: ["firstname", "lastname"],
+          where: { id: desk.userId },
+        });
+        if (user) officeUsers.push(user.firstname + " " + user.lastname);
+      }
+      office.dataValues.officeUsers = officeUsers;
+    }
+    // add free desks count
+    let freeDesks = [];
+    freeDesks = await Desk.findAll({
+      attributes: ["userId"],
+      where: { officeId: office.id, usable: true, userId: null },
+    });
+    const freeDesksCount = freeDesks.length;
+    office.dataValues.freeDesksCount = freeDesksCount;
+    // add occupied desks count
+    office.dataValues.occupiedDesksCount =
+      office.usableDesksCount - freeDesksCount;
+    // add occupation percentage
+    if (office.usableDesksCount != 0)
+      office.dataValues.occupationPercentage =
+        office.dataValues.occupiedDesksCount / office.usableDesksCount;
+    else office.occupationPercentage = 0;
 
     return res.status(200).send(office);
   } catch (err) {
