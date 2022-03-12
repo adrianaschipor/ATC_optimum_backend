@@ -26,6 +26,10 @@ exports.create = async (req, res) => {
         message: "Invalid Address. There's already a building at this address.",
       });
     //floorsCount
+    if (isNaN(floorsCount) || isNaN(parseInt(floorsCount)))
+      return res.status(400).send({
+        message: "Invalid Floors Count: must be a number",
+      });
     if (floorsCount == null || floorsCount < 1 || floorsCount > 150)
       return res.status(400).send({ message: "Invalid Floors Count." });
 
@@ -67,6 +71,10 @@ exports.update = async (req, res) => {
         message: "Invalid Address. There's already a building at this address.",
       });
     //floorsCount
+    if (isNaN(floorsCount) || isNaN(parseInt(floorsCount)))
+      return res.status(400).send({
+        message: "Invalid Floors Count: must be a number",
+      });
     if (floorsCount == null || floorsCount < 1 || floorsCount > 150)
       return res.status(400).send({ message: "Invalid Floors Count." });
 
