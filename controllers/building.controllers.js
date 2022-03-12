@@ -1,4 +1,9 @@
 const Building = require("../models/building.model");
+const Office = require("../models/office.model");
+const Desk = require("../models/desk.model");
+
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
 //Create new Building
 exports.create = async (req, res) => {
@@ -89,6 +94,25 @@ exports.delete = async (req, res) => {
       where: { id: req.params.buildingId },
     });
     if (!currentBuilding) return res.status(404).send("Building not found.");
+
+    // Check if all offices from building are free
+    let offices = {};
+    offices = await Office.findAll({
+      attributes: ["id"],
+      where: { buildingId: req.params.buildingId },
+    });
+
+    for (let office of offices) {
+      let occupiedDesks = {};
+      occupiedDesks = await Desk.findAll({
+        attributes: ["id"],
+        where: { officeId: office.id, userId: { [Op.not]: null } },
+      });
+      if (occupiedDesks.length > 0)
+        return res.status(400).send({
+          message: "Cannot remove building: not all offices are empty",
+        });
+    }
 
     if ((await Building.destroy({ where: { id: req.params.buildingId } })) != 1)
       return res.status(404).send({ message: "Couldn't remove building." });
