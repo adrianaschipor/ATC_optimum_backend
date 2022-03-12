@@ -150,3 +150,39 @@ exports.assignToOffice = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+// Admins and Office Admins can deassign an user from an office
+exports.deassignFromOffice = async (req, res) => {
+  try {
+    const { officeId, userId } = req.body;
+
+    // get the office
+    const office = await Office.findOne({ where: { id: officeId } });
+    if (!office) return res.status(404).send(" Office not found !");
+    // Office Administrator can deassign desks only from the offices which are under his administration
+    if (req.user.role === "Office Admin")
+      if (office.officeAdminId != req.user.id)
+        return res
+          .status(403)
+          .send("Forbbiden: This office is not under you administration.");
+    // check if the user exists
+    const user = await User.findOne({ where: { id: userId } });
+    if (!user) return res.status(404).send(" User not found !");
+    // get user's desk from that office
+    const desk = await Desk.findOne({
+      where: { officeId: officeId, userId: userId },
+    });
+    // chack if user has actually a desk assigned in that office
+    if (!desk)
+      return res
+        .status(400)
+        .send("No desk assigned to this user in this office!");
+
+    // deassign the desk
+    desk.userId = null;
+    await desk.save();
+    return res.status(200).send("Desk successfully deassigned!");
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
