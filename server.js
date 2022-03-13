@@ -29,6 +29,21 @@ database
   .then(() => console.log("Successfully connected to database"))
   .catch((err) => console.log("ErrorL:" + err));
 
+user_model = require("./models/user.model");
+building_model = require("./models/building.model");
+office_model = require("./models/office.model");
+desk_model = require("./models/desk.model");
+remote_model = require("./models/remoteReq.model");
+attachment_model = require("./models/attachment.model");
+deskReq_model = require("./models/deskReq.model");
+
+require("./routes/auth.routes")(app);
+require("./routes/user.routes")(app);
+require("./routes/building.routes")(app);
+require("./routes/office.routes")(app);
+require("./routes/desk.routes")(app);
+require("./routes/remoteReq.routes")(app);
+
 var port = process.env.PORT || PORT;
 const server = app.listen(port);
 console.log(`Running on http://${HOST}:${PORT}`);
