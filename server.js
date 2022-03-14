@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const database = require("./config/database.config");
 
-const HOST = "127.0.0.1";
+const HOST = "0.0.0.0";
 const PORT = 8080;
 
 // App
@@ -43,6 +43,7 @@ require("./routes/building.routes")(app);
 require("./routes/office.routes")(app);
 require("./routes/desk.routes")(app);
 require("./routes/remoteReq.routes")(app);
+require("./routes/deskReq.routes")(app);
 
 var port = process.env.PORT || PORT;
 const server = app.listen(port);
