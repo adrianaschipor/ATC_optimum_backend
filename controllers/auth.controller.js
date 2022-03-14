@@ -41,7 +41,11 @@ exports.login = async (req, res) => {
   });
   return res
     .status(201)
-    .json({ accessToken: accessToken, refreshToken: refreshToken });
+    .json({
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+      role: user.role,
+    });
 };
 
 // Refresh token controller - used when access token expires
