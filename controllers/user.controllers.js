@@ -39,13 +39,13 @@ exports.create = async (req, res) => {
       return res.status(400).send({ message: "Invalid email format" });
     }
     //password
-    var regex =
+    /* var regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!regex.test(password)) {
       return res.status(400).json({
         msg: "Invalid password. Minimum 8 characters, at least one letter, one number and one special character",
       });
-    }
+    }*/
     //role
     if (role != "Admin" && role != "Office Admin" && role != "Employee")
       return res.status(400).send({
@@ -135,13 +135,13 @@ exports.update = async (req, res) => {
       return res.status(400).send({ message: "Invalid email format" });
     }
     //password
-    var regex =
+    /*var regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!regex.test(password)) {
       return res.status(400).json({
         msg: "Invalid password. Minimum 8 characters, at least one letter, one number and one special character",
       });
-    }
+    }*/
     //role
     if (role != "Admin" && role != "Office Admin" && role != "Employee")
       return res.status(400).send({
