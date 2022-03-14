@@ -39,7 +39,7 @@ module.exports = (app) => {
   // Get all users from an Office Admin office
   // This is available only for an authenticated Office Admin with an active account
   app.get(
-    "/allUsersFromOffice/:officeId",
+    "/allUsersFromOffice`/:officeId",
     auth,
     authOfficeAdmin,
     User.findAllUsersFromOffice
