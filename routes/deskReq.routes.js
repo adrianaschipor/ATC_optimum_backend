@@ -29,6 +29,16 @@ module.exports = (app) => {
     DeskReq.findAllPending
   );
 
+  // Endpoint for getting a list of all pending request for an office
+  // Only an authenticated Office Admin with an active account can perform this
+  app.get(
+    "/pendingDeskReq/:officeId",
+    auth,
+    authOffceAdmin,
+    activeAccount,
+    DeskReq.findAllPendingFromOffice
+  );
+
   // Endpoint for getting a list of all user's request
   // Only an authenticated Employee with an active account can perform this
   app.get("/allDeskReq", auth, authEmployee, activeAccount, DeskReq.findAll);

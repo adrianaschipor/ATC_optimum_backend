@@ -172,6 +172,28 @@ exports.findAllPending = async (req, res) => {
   }
 };
 
+// get all pending requests for desks from an office
+exports.findAllPendingFromOffice = async (req, res) => {
+  try {
+    //check if offices is actually under this office admin's administration
+    const office = await Office.findOne({
+      where: { id: req.params.officeId, officeAdminId: req.user.id },
+    });
+    if (!office)
+      return res.status(403).json({
+        msg: "Forbidden: This office is not under your administration",
+      });
+
+    // get the requests
+    const allRequests = await DeskReq.findAll({
+      where: { officeId: req.params.officeId },
+    });
+    return res.status(200).send(allRequests);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
 // get all user's requests
 exports.findAll = async (req, res) => {
   try {
