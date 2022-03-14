@@ -33,7 +33,7 @@ module.exports = (app) => {
   // Only an authenticated Admin with an active account can perform this
   app.get("/allBuildings", auth, authAdmin, activeAccount, Building.findAll);
 
-  // Endpoint for getting details about a specific building
+  // Endpoint for getting details about a specific building (Building metrics included)
   // Only an authenticated Admin with an active account can perform this
   app.get(
     "/building/:buildingId",
