@@ -23,7 +23,7 @@ exports.create = async (req, res) => {
         message:
           "Invalid Request Reason: You should provide a reason for your request",
       });
-    if (requestReason.length > 2000)
+    if (requestReason.length > 50)
       return res.status(400).send({
         message: "Invalid Request Reason: Your reason is too long",
       });
@@ -103,7 +103,7 @@ exports.approval = async (req, res) => {
           message:
             "Invalid Rejection Reason: You should provide a reason for your rejection",
         });
-      if (rejectReason.length > 2000)
+      if (rejectReason.length > 50)
         return res.status(400).send({
           message: "Invalid Rejection Reason: Your reason is too long",
         });
