@@ -38,18 +38,38 @@ exports.create = async (req, res) => {
           "Invalid Name: There's already an office with this name in this building",
       });
     //floorNo
+    if (isNaN(floorNo) || isNaN(parseInt(floorNo)))
+      return res.status(400).send({
+        message: "Invalid Floor No: must be a number",
+      });
     if (floorNo == null || floorNo > building.floorsCount || floorNo < 0)
       return res.status(400).send({ message: "Invalid Floor Number." });
     //totalDesksCount
+    if (isNaN(totalDesksCount) || isNaN(parseInt(totalDesksCount)))
+      return res.status(400).send({
+        message: "Invalid Total Desks Count: must be a number",
+      });
     if (totalDesksCount < 0 || totalDesksCount > 300)
       return res.status(400).send({ message: "Invalid Total Desks Count." });
     //usableDesksCount
+    if (isNaN(usableDesksCount) || isNaN(parseInt(usableDesksCount)))
+      return res.status(400).send({
+        message: "Invalid Usable Desks Count: must be a number",
+      });
     if (usableDesksCount < 0 || usableDesksCount > totalDesksCount)
       return res.status(400).send({ message: "Invalid Usable Desks Count." });
     //width
+    if (isNaN(width) || isNaN(parseFloat(width)))
+      return res.status(400).send({
+        message: "Invalid Width: must be a number",
+      });
     if (width < 5 || width > 500)
       return res.status(400).send({ message: "Invalid Width." });
     //length
+    if (isNaN(length) || isNaN(parseFloat(length)))
+      return res.status(400).send({
+        message: "Invalid Length: must be a number",
+      });
     if (length < 5 || length > 500)
       return res.status(400).send({ message: "Invalid Length." });
     //officeAdminId - optional
@@ -161,10 +181,18 @@ exports.update = async (req, res) => {
       });
 
     //floorNo
-    building = await Building.findOne({ where: { id: buildingId } });
+    if (isNaN(floorNo) || isNaN(parseInt(floorNo)))
+      return res.status(400).send({
+        message: "Invalid Floor No: must be a number",
+      });
+    const building = await Building.findOne({ where: { id: buildingId } });
     if (floorNo == null || floorNo > building.floorsCount || floorNo < 0)
       return res.status(400).send({ message: "Invalid Floor Number." });
     //totalDesksCount
+    if (isNaN(totalDesksCount) || isNaN(parseInt(totalDesksCount)))
+      return res.status(400).send({
+        message: "Invalid Total Desks Count: must be a number",
+      });
     if (
       totalDesksCount < 0 ||
       totalDesksCount > 300 ||
@@ -172,12 +200,24 @@ exports.update = async (req, res) => {
     )
       return res.status(400).send({ message: "Invalid Total Desks Count." });
     //usableDesksCount
+    if (isNaN(usableDesksCount) || isNaN(parseInt(usableDesksCount)))
+      return res.status(400).send({
+        message: "Invalid Usable Desks Count: must be a number",
+      });
     if (usableDesksCount < 0 || usableDesksCount > totalDesksCount)
       return res.status(400).send({ message: "Invalid Usable Desks Count." });
     //width
+    if (isNaN(width) || isNaN(parseFloat(width)))
+      return res.status(400).send({
+        message: "Invalid Width: must be a number",
+      });
     if (width < 5 || width > 500)
       return res.status(400).send({ message: "Invalid Width." });
     //length
+    if (isNaN(length) || isNaN(parseFloat(length)))
+      return res.status(400).send({
+        message: "Invalid Length: must be a number",
+      });
     if (length < 5 || length > 500)
       return res.status(400).send({ message: "Invalid Length." });
     //officeAdminId - optional
