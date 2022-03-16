@@ -36,8 +36,14 @@ module.exports = (app) => {
     User.findAllByName
   );
 
-  // Get all users from an Office Admin offices -> May or may not be needed
-  //   app.get("/allUsersOfOfficeAdmin", auth, authOfficeAdmin,User.findAllUsersOfOfficeAdmin);
+  // Get all users from an Office Admin office
+  // This is available only for an authenticated Office Admin with an active account
+  app.get(
+    "/allUsersFromOffice`/:officeId",
+    auth,
+    authOfficeAdmin,
+    User.findAllUsersFromOffice
+  );
 
   // Endpoint for geting all users - !! NOT needed -> included in findAllByName, no substring introduced situation -> Don't know for sure yet, also not required
   // This is used for visualising users when selecting one

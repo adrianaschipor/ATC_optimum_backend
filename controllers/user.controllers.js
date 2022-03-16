@@ -39,13 +39,13 @@ exports.create = async (req, res) => {
       return res.status(400).send({ message: "Invalid email format" });
     }
     //password
-    var regex =
+    /* var regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!regex.test(password)) {
       return res.status(400).json({
         msg: "Invalid password. Minimum 8 characters, at least one letter, one number and one special character",
       });
-    }
+    }*/
     //role
     if (role != "Admin" && role != "Office Admin" && role != "Employee")
       return res.status(400).send({
@@ -135,13 +135,13 @@ exports.update = async (req, res) => {
       return res.status(400).send({ message: "Invalid email format" });
     }
     //password
-    var regex =
+    /*var regex =
       /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/;
     if (!regex.test(password)) {
       return res.status(400).json({
         msg: "Invalid password. Minimum 8 characters, at least one letter, one number and one special character",
       });
-    }
+    }*/
     //role
     if (role != "Admin" && role != "Office Admin" && role != "Employee")
       return res.status(400).send({
@@ -322,6 +322,43 @@ exports.findAllOfficeAdmins = async (req, res) => {
       where: { role: "Office Admin" },
     });
     return res.status(200).send(officeAdmins);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+// Controller that returns all users from an office admin offices
+exports.findAllUsersFromOffice = async (req, res) => {
+  try {
+    //check if office is actually under this office admin's administration
+    const office = await Office.findOne({
+      where: { id: req.params.officeId, officeAdminId: req.user.id },
+    });
+    if (!office)
+      return res.status(403).json({
+        msg: "Forbidden: This office is not under your administration",
+      });
+
+    //get users from this office
+    const occupiedDesks = await Desk.findAll({
+      attributes: ["userId"],
+      where: {
+        officeId: req.params.officeId,
+        usable: true,
+        userId: {
+          [Op.ne]: null,
+        },
+      },
+    });
+    for (const occupiedDesk of occupiedDesks) {
+      const user = await User.findOne({
+        attributes: ["firstname", "lastname"],
+        where: { id: occupiedDesk.userId },
+      });
+      if (user)
+        occupiedDesk.dataValues.userName = user.firstname + " " + user.lastname;
+    }
+    return res.status(200).send(occupiedDesks);
   } catch (err) {
     return res.status(500).send({ message: err.message });
   }
