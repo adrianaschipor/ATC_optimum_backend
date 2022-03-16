@@ -30,6 +30,9 @@ exports.create = async (req, res) => {
 
     // CONSTRAINTS
 
+    //const userId = req.user.id;
+    const userId = 4; // We assume that user with id 4 is making this request as long as we don't have login functionality
+
     // check if the requesting user is already working remote this month
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -37,7 +40,7 @@ exports.create = async (req, res) => {
     const alreadyRemote = await RemoteReq.findOne({
       where: {
         [Op.and]: [
-          { userId: req.user.id },
+          { userId: userId },
           { status: "Approved" },
           { year: currentYear },
           { month: currentMonth },
@@ -53,7 +56,7 @@ exports.create = async (req, res) => {
     const pendingReq = await RemoteReq.findOne({
       where: {
         [Op.and]: [
-          { userId: req.user.id },
+          { userId: userId },
           { status: "Pending" },
           { year: currentYear },
           { month: currentMonth },
@@ -72,7 +75,7 @@ exports.create = async (req, res) => {
       year: currentYear,
       month: currentMonth,
       status: "Pending",
-      userId: req.user.id,
+      userId: userId,
     };
 
     const remoteReq = await RemoteReq.create(newRemoteReq);
@@ -132,7 +135,7 @@ exports.approval = async (req, res) => {
 exports.findAll = async (req, res) => {
   try {
     let requests = {};
-    // the Admin gets to see all the requests, while the other users can see only their own requests
+    //the Admin gets to see all the requests, while the other users can see only their own requests
     if (req.user.role === "Admin") {
       requests = await RemoteReq.findAll();
     } else {

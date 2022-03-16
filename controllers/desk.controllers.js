@@ -95,11 +95,11 @@ exports.assignToOffice = async (req, res) => {
     const office = await Office.findOne({ where: { id: officeId } });
     if (!office) return res.status(404).send(" Office not found !");
     // Office Administrator can assign desks only in the offices which are under his administration
-    if (req.user.role === "Office Admin")
+    /*if (req.user.role === "Office Admin")
       if (office.officeAdminId != req.user.id)
         return res
           .status(403)
-          .send("Forbbiden: This office is not under you administration.");
+          .send("Forbbiden: This office is not under you administration.");*/
     // check if there are free desks in the office
     let freeDesks = [];
     freeDesks = await Desk.findAll({
@@ -160,11 +160,11 @@ exports.deassignFromOffice = async (req, res) => {
     const office = await Office.findOne({ where: { id: officeId } });
     if (!office) return res.status(404).send(" Office not found !");
     // Office Administrator can deassign desks only from the offices which are under his administration
-    if (req.user.role === "Office Admin")
+    /*if (req.user.role === "Office Admin")
       if (office.officeAdminId != req.user.id)
         return res
           .status(403)
-          .send("Forbbiden: This office is not under you administration.");
+          .send("Forbbiden: This office is not under you administration.");*/
     // check if the user exists
     const user = await User.findOne({ where: { id: userId } });
     if (!user) return res.status(404).send(" User not found !");

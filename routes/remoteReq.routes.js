@@ -5,7 +5,7 @@ module.exports = (app) => {
   const authAllUsers = require("../middlewares/authAllUsers");
 
   //Send a request to work remote
-  app.post("/remoteReq", auth, authAllUsers, RemoteReq.create);
+  app.post("/remoteReq", /* auth, authAllUsers,*/ RemoteReq.create);
 
   //used for approving/rejecting a request
   app.put("/remoteReq/:remoteReqId", /*auth, authAdmin, */ RemoteReq.approval);
