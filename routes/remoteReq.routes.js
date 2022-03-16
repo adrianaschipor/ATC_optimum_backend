@@ -8,11 +8,11 @@ module.exports = (app) => {
   app.post("/remoteReq", auth, authAllUsers, RemoteReq.create);
 
   //used for approving/rejecting a request
-  app.put("/remoteReq/:remoteReqId", auth, authAdmin, RemoteReq.approval);
+  app.put("/remoteReq/:remoteReqId", /*auth, authAdmin, */ RemoteReq.approval);
 
   //user gets to see all his remote requests, admin can see of all users
-  app.get("/allRemoteReq", auth, authAllUsers, RemoteReq.findAll);
+  app.get("/allRemoteReq", /* auth, authAllUsers,*/ RemoteReq.findAll);
 
   //admin gets to see all pending requests
-  app.get("/pendingRemoteReq", auth, authAdmin, RemoteReq.findAllPending);
+  app.get("/pendingRemoteReq", /*auth, authAdmin,*/ RemoteReq.findAllPending);
 };

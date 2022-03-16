@@ -9,41 +9,51 @@ const activeAccount = require("../middlewares/activeAccount");
 module.exports = (app) => {
   // Endpoint for creating a new user
   // Only an authenticated Admin with an active account can perform this
-  app.post("/user", auth, authAdmin, activeAccount, User.create);
+  app.post("/user", /* auth, authAdmin, activeAccount,*/ User.create);
 
   // Endpoint for updating an existing user, change of "active" (activate/deactivate) is also treated here
   // Only an authenticated Admin with an active account can perform this
-  app.put("/user/:userId", auth, authAdmin, activeAccount, User.update);
+  app.put("/allUsers/:userId", /*auth, authAdmin, activeAccount,*/ User.update);
 
   // Endpoint used for getting all office admins when adding/updating an office
   // Only an authenticated Admin with an active account can perform this
   app.get(
     "/allOfficeAdmins",
-    auth,
+    /* auth,
     authAdmin,
-    activeAccount,
+    activeAccount,*/
     User.findAllOfficeAdmins
   );
 
   // Endpoint for getting all users based on name search
   // This is available for all authenticated users with an active account
   // Admins get more details than other type of user
+  // app.get(
+  //   "/allUsers/:name",
+  //   /* auth,
+  //   authAllUsers,
+  //   activeAccount,*/
+  //   User.findAllByName
+  // );
+
   app.get(
-    "/allUsers/:name",
-    auth,
+    "/allUsers",
+    /* auth,
     authAllUsers,
-    activeAccount,
-    User.findAllByName
+    activeAccount,*/
+    User.findAll
   );
 
   // Get all users from an Office Admin office
   // This is available only for an authenticated Office Admin with an active account
   app.get(
     "/allUsersFromOffice`/:officeId",
-    auth,
-    authOfficeAdmin,
+    /*  auth,
+    authOfficeAdmin,*/
     User.findAllUsersFromOffice
   );
+
+  app.get("/allUsers/:userId", User.findOne);
 
   // Endpoint for geting all users - !! NOT needed -> included in findAllByName, no substring introduced situation -> Don't know for sure yet, also not required
   // This is used for visualising users when selecting one

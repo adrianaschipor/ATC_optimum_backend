@@ -17,9 +17,9 @@ module.exports = (app) => {
   // Only an authenticated Admin or Office Admin with an active account can perform this
   app.post(
     "/assignToOffice",
-    auth,
+    /*  auth,
     authAllAdminTypes,
-    activeAccount,
+    activeAccount,*/
     Desk.assignToOffice
   );
 
@@ -27,9 +27,9 @@ module.exports = (app) => {
   // Only an authenticated Admin or Office Admin with an active account can perform this
   app.post(
     "/deassignFromOffice",
-    auth,
+    /*   auth,
     authAllAdminTypes,
-    activeAccount,
+    activeAccount,*/
     Desk.deassignFromOffice
   );
 

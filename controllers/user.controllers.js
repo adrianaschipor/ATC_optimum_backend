@@ -363,3 +363,201 @@ exports.findAllUsersFromOffice = async (req, res) => {
     return res.status(500).send({ message: err.message });
   }
 };
+
+// Find all users
+// controller that returns all users
+exports.findAll = async (req, res) => {
+  try {
+    let users = {};
+    // if (req.user.role === "Admin") {
+    // Admins have access to more information than other users
+    users = await User.findAll({
+      attributes: [
+        "id",
+        "firstname",
+        "lastname",
+        "email",
+        "role",
+        "gender",
+        "birthday",
+        "nationality",
+        "active",
+      ],
+    });
+    // } else {
+    //   users = await User.findAll({
+    //     attributes: ["id", "firstname", "lastname"],
+    //     where: {
+    //       [Op.and]: [
+    //         {
+    //           [Op.or]: [
+    //             { firstname: { [Op.like]: substr } },
+    //             { lastname: { [Op.like]: substr } },
+    //           ],
+    //         },
+    //         // usual user shouldn't be able to see deactivated accounts
+    //         { active: true },
+    //       ],
+    //     },
+    //   });
+    // }
+
+    // Add info about building, office and remote working for every user
+    for (let user of users) {
+      // search for office and building info
+      const desk = await Desk.findOne({
+        attributes: ["id", "officeId"],
+        where: { userId: user.id },
+      });
+      if (desk) {
+        const office = await Office.findOne({
+          attributes: ["id", "name", "buildingId"],
+          where: { id: desk.officeId },
+        });
+        if (office) {
+          // add info about office
+          user.dataValues.officeId = office.id;
+          user.dataValues.officeName = office.name;
+          const building = await Building.findOne({
+            attributes: ["id", "name"],
+          });
+          if (building) {
+            //add info about building
+            user.dataValues.buildingId = building.id;
+            user.dataValues.buildingName = building.name;
+          }
+        }
+      }
+      // search for remote info
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const currentMonth = currentDate.getMonth() + 1; //the +1 converts the month from digital (0-11) to normal.
+      const workingRemote = await RemoteReq.findOne({
+        attributes: ["percentage"],
+        where: {
+          [Op.and]: [
+            { userId: user.id },
+            { status: "Approved" },
+            { year: currentYear },
+            { month: currentMonth },
+          ],
+        },
+      });
+      // add remote info
+      if (workingRemote) {
+        if (workingRemote.percentage === 100)
+          user.dataValues.remoteStatus = "fully remote";
+        else {
+          user.dataValues.remoteStatus = "partially remote";
+          user.dataValues.remotePercentage = workingRemote.percentage;
+        }
+      } else {
+        user.dataValues.remoteStatus = "NO";
+      }
+    }
+
+    return res.status(200).send(users);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};
+
+// Find one user by id
+
+// Find all users
+// controller that returns all users
+exports.findOne = async (req, res) => {
+  try {
+    // if (req.user.role === "Admin") {
+    // Admins have access to more information than other users
+    const user = await User.findOne({
+      attributes: [
+        "id",
+        "firstname",
+        "lastname",
+        "email",
+        "role",
+        "gender",
+        "birthday",
+        "nationality",
+        "active",
+      ],
+      where: { id: req.params.userId },
+    });
+    // } else {
+    //   users = await User.findAll({
+    //     attributes: ["id", "firstname", "lastname"],
+    //     where: {
+    //       [Op.and]: [
+    //         {
+    //           [Op.or]: [
+    //             { firstname: { [Op.like]: substr } },
+    //             { lastname: { [Op.like]: substr } },
+    //           ],
+    //         },
+    //         // usual user shouldn't be able to see deactivated accounts
+    //         { active: true },
+    //       ],
+    //     },
+    //   });
+    // }
+
+    // Add info about building, office and remote working for every user
+    //for (let user of users) {
+    // search for office and building info
+    const desk = await Desk.findOne({
+      attributes: ["id", "officeId"],
+      where: { userId: user.id },
+    });
+    if (desk) {
+      const office = await Office.findOne({
+        attributes: ["id", "name", "buildingId"],
+        where: { id: desk.officeId },
+      });
+      if (office) {
+        // add info about office
+        user.dataValues.officeId = office.id;
+        user.dataValues.officeName = office.name;
+        const building = await Building.findOne({
+          attributes: ["id", "name"],
+        });
+        if (building) {
+          //add info about building
+          user.dataValues.buildingId = building.id;
+          user.dataValues.buildingName = building.name;
+        }
+      }
+    }
+    // search for remote info
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; //the +1 converts the month from digital (0-11) to normal.
+    const workingRemote = await RemoteReq.findOne({
+      attributes: ["percentage"],
+      where: {
+        [Op.and]: [
+          { userId: user.id },
+          { status: "Approved" },
+          { year: currentYear },
+          { month: currentMonth },
+        ],
+      },
+    });
+    // add remote info
+    if (workingRemote) {
+      if (workingRemote.percentage === 100)
+        user.dataValues.remoteStatus = "fully remote";
+      else {
+        user.dataValues.remoteStatus = "partially remote";
+        user.dataValues.remotePercentage = workingRemote.percentage;
+      }
+    } else {
+      user.dataValues.remoteStatus = "NO";
+    }
+    //}
+
+    return res.status(200).send(user);
+  } catch (err) {
+    return res.status(500).send({ message: err.message });
+  }
+};

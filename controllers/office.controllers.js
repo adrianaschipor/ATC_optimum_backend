@@ -348,7 +348,8 @@ exports.findAll = async (req, res) => {
         // add occupation percentage
         if (office.usableDesksCount != 0)
           office.dataValues.occupationPercentage =
-            office.dataValues.occupiedDesksCount / office.usableDesksCount;
+            (office.dataValues.occupiedDesksCount / office.usableDesksCount) *
+            100;
         else office.occupationPercentage = 0;
       }
     }
@@ -483,7 +484,7 @@ exports.findOne = async (req, res) => {
     // add occupation percentage
     if (office.usableDesksCount != 0)
       office.dataValues.occupationPercentage =
-        office.dataValues.occupiedDesksCount / office.usableDesksCount;
+        (office.dataValues.occupiedDesksCount / office.usableDesksCount) * 100;
     else office.occupationPercentage = 0;
 
     return res.status(200).send(office);

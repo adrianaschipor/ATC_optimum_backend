@@ -49,6 +49,7 @@ exports.create = async (req, res) => {
 //Update existing Building
 exports.update = async (req, res) => {
   try {
+    console.log("\n\n\n" + req.body + "\n\n\n");
     const { name, address, floorsCount } = req.body;
 
     const currentBuilding = await Building.findOne({
