@@ -1,5 +1,6 @@
 const RemoteReq = require("../models/remoteReq.model");
 const Desk = require("../models/desk.model");
+const User = require("../models/user.model");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
@@ -32,6 +33,7 @@ exports.create = async (req, res) => {
 
     //const userId = req.user.id;
     const userId = 4; // We assume that user with id 4 is making this request as long as we don't have login functionality
+    // !!!!! Make sure this user exists in database
 
     // check if the requesting user is already working remote this month
     const currentDate = new Date();
@@ -152,6 +154,14 @@ exports.findAllPending = async (req, res) => {
   try {
     let requests = {};
     requests = await RemoteReq.findAll({ where: { status: "Pending" } });
+    for (const request of requests) {
+      const user = await User.findOne({
+        attributes: ["firstname", "lastname"],
+        where: { id: request.userId },
+      });
+      if (user)
+        request.dataValues.username = user.firstname + " " + user.lastname;
+    }
     return res.status(200).send(requests);
   } catch (err) {
     return res.status(500).send({ message: err.message });
