@@ -136,6 +136,41 @@ exports.findAll = async (req, res) => {
   try {
     let buildings = {};
     buildings = await Building.findAll();
+    // Add building metrics details for each building
+    for (const building of buildings) {
+      // total no of offices
+      let offices = await Office.findAll({
+        where: { buildingId: building.id },
+      });
+      building.dataValues.officesNo = offices.length;
+      // No of total/usable/free desks from building
+      let totalDesksFromB = 0;
+      let totalUsableFromB = 0;
+      let totalFreeFromB = 0;
+      for (const office of offices) {
+        //total from office
+        totalDesksFromB += office.totalDesksCount;
+        //usable from office
+        totalUsableFromB += office.usableDesksCount;
+        //free form office
+        const freeDesksFromOff = await Desk.findAll({
+          attributes: ["id"],
+          where: { officeId: office.id, usable: true, userId: null },
+        });
+        totalFreeFromB += freeDesksFromOff.length;
+      }
+      building.dataValues.totalDesksCount = totalDesksFromB;
+      building.dataValues.usableDesksCount = totalUsableFromB;
+      building.dataValues.freeDesksCount = totalFreeFromB;
+      //no of occupied desks from building
+      let totalOccupiedFromB = totalUsableFromB - totalFreeFromB;
+      building.dataValues.occupiedDesksCount = totalOccupiedFromB;
+      //occupation percentage
+      if (totalUsableFromB === 0) building.dataValues.occupationPercentage = 0;
+      else
+        building.dataValues.occupationPercentage =
+          (totalOccupiedFromB / totalUsableFromB) * 100;
+    }
     return res.status(200).send(buildings);
   } catch (err) {
     return res.status(500).send({ message: err.message });
@@ -182,7 +217,7 @@ exports.findOne = async (req, res) => {
     if (totalUsableFromB === 0) building.dataValues.occupationPercentage = 0;
     else
       building.dataValues.occupationPercentage =
-        totalOccupiedFromB / totalUsableFromB;
+        (totalOccupiedFromB / totalUsableFromB) * 100;
 
     return res.status(200).send(building);
   } catch (err) {
